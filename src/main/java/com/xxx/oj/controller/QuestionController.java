@@ -12,11 +12,15 @@ import com.xxx.oj.constant.UserConstant;
 import com.xxx.oj.exception.BusinessException;
 import com.xxx.oj.exception.ThrowUtils;
 import com.xxx.oj.model.dto.question.*;
-import com.xxx.oj.model.dto.question.*;
+import com.xxx.oj.model.dto.questionsubmit.QuestionSubmitAddRequest;
+import com.xxx.oj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.xxx.oj.model.entity.Question;
+import com.xxx.oj.model.entity.QuestionSubmit;
 import com.xxx.oj.model.entity.User;
+import com.xxx.oj.model.vo.QuestionSubmitVO;
 import com.xxx.oj.model.vo.QuestionVO;
 import com.xxx.oj.service.QuestionService;
+import com.xxx.oj.service.QuestionSubmitService;
 import com.xxx.oj.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -278,6 +282,46 @@ public class QuestionController {
         }
         boolean result = questionService.updateById(question);
         return ResultUtils.success(result);
+    }
+
+
+    @Resource
+    private QuestionSubmitService questionSubmitService;
+
+    /**
+     *
+     * @param questionSubmitAddRequest
+     * @param request
+     * @return 提交记录id
+     */
+    @PostMapping("/question_submit/do")
+    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
+                                               HttpServletRequest request) {
+        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 登录才能点赞
+        final User loginUser = userService.getLoginUser(request);
+        long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
+        return ResultUtils.success(questionSubmitId);
+    }
+
+    /**
+     * 分页获取提交列表（除了管理员外，普通用户看不到提交代码）
+     *
+     * @param questionSubmitQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/question_submit/list/page")
+    public BaseResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest,
+                                                                         HttpServletRequest request) {
+        long current = questionSubmitQueryRequest.getCurrent();
+        long size = questionSubmitQueryRequest.getPageSize();
+        Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, size),
+                questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
+        final User loginUser=userService.getLoginUser(request);
+        return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage,loginUser));
     }
 
 }

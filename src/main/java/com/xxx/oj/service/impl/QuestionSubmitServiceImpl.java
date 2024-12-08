@@ -109,10 +109,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         String sortField = questionSubmitQueryRequest.getSortField();
         String sortOrder = questionSubmitQueryRequest.getSortOrder();
         // 拼接查询条件
-        queryWrapper.ne(ObjectUtils.isNotEmpty(language), "language", language);
-        queryWrapper.ne(ObjectUtils.isNotEmpty(userId), "userId", userId);
-        queryWrapper.ne(ObjectUtils.isNotEmpty(questionId), "questionId", questionId);
-        queryWrapper.ne(QuestionSubmitStatusEnum.getEnumByValue(status)!=null, "status", status);
+        queryWrapper.eq(ObjectUtils.isNotEmpty(language), "language", language);
+        queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
+        queryWrapper.eq(ObjectUtils.isNotEmpty(questionId), "questionId", questionId);
+        queryWrapper.eq(QuestionSubmitStatusEnum.getEnumByValue(status)!=null, "status", status);
 
         queryWrapper.eq("isDelete",false);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
