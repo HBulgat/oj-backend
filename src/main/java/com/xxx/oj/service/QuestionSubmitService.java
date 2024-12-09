@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xxx.oj.model.entity.User;
 import com.xxx.oj.model.vo.QuestionSubmitVO;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
 * @author Bulgat
 * @description 针对表【question_submit(题目提交)】的数据库操作Service
@@ -41,7 +43,7 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
      * @param loginUser
      * @return
      */
-    QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser);
+    QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit,User loginUser);
 
     /**
      * 分页获取题目封装

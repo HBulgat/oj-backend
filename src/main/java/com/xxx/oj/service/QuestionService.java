@@ -37,10 +37,10 @@ public interface QuestionService extends IService<Question> {
      * 获取题目封装
      *
      * @param question
-     * @param request
+     * @param
      * @return
      */
-    QuestionVO getQuestionVO(Question question, HttpServletRequest request);
+    QuestionVO getQuestionVO(Question question);
 
     /**
      * 分页获取题目封装

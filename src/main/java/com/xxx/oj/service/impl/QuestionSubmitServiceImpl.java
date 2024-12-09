@@ -11,6 +11,7 @@ import com.xxx.oj.judge.JudgeService;
 import com.xxx.oj.mapper.QuestionSubmitMapper;
 import com.xxx.oj.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.xxx.oj.model.enums.QuestionSubmitLanguageEnum;
+import com.xxx.oj.model.vo.QuestionVO;
 import com.xxx.oj.service.QuestionSubmitService;
 import com.xxx.oj.utils.SqlUtils;
 import com.xxx.oj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -121,12 +123,19 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     }
 
     @Override
-    public QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser) {
+    public QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit,User loginUser) {
         QuestionSubmitVO questionSubmitVO = QuestionSubmitVO.objToVo(questionSubmit);
         long userId = loginUser.getId();
-        if (userId!=questionSubmit.getUserId() && !userService.isAdmin(loginUser)){
+        if (userId!=questionSubmit.getUserId() || !userService.isAdmin(loginUser)){
             questionSubmitVO.setCode(null);
         }
+        Long questionId = questionSubmitVO.getQuestionId();
+        Question question = questionService.getById(questionId);
+        if (question == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        QuestionVO questionVO=questionService.getQuestionVO(question);
+        questionSubmitVO.setQuestionVO(questionVO);
         return questionSubmitVO;
     }
 
